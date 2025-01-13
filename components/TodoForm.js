@@ -1,8 +1,30 @@
 import React from "react";
 import { StyleSheet, Text, View, TextInput, Button } from "react-native";
+import { useSelector } from "react-redux";
+import { addTodo } from "../lib/features/TodoList/service";
 
 export default function TodoForm({navigation}) {
-  return (
+  const {loading, error} = useSelector((state)=> state.todoList); 
+  const [todo, setTodo] = React.useState("");
+
+  function saveTodo() {
+    //send a post request to the server
+    addTodo({
+      title: todo,
+      completed: false,
+    });
+    navigation.goBack();
+  }
+
+  if(loading === true){
+    return <Text style={styles.loading}>Loading...</Text>  
+  }
+  if(error){
+    return <Text style={styles.error}>{error}</Text>  
+  }
+
+ 
+  return (  
     <>
       <View style={styles.container}>
         <Button
@@ -11,13 +33,28 @@ export default function TodoForm({navigation}) {
           onPress={() => navigation.goBack()}
         />
         <Text style={styles.title}>Todolist form!</Text>
-        <TextInput placeholder="search" style={styles.input}></TextInput>
+        <TextInput placeholder="search" onChangeText={setTodo} style={styles.input}></TextInput>
+        <Button title="Save Todo" onPress={saveTodo} />
       </View>
     </>
   );
 }
 
 const styles = StyleSheet.create({
+  error: {
+    color: "red",
+    backgroundColor: "#F0F0F0",
+    Text: "#3333333",
+    width: 400,
+    padding: 10,
+  },
+  loading: {
+    color: "black",
+    backgroundColor: "#F0F0F0",
+    Text: "#3333333",
+    width: 400,
+    padding: 10,
+  },
   backButton: {
     color: "#fff",
     backgroundColor: "#F0F0F0",
@@ -28,11 +65,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    fontSize: 100,
     alignItems: "center",
   },
   title: {
-    fontSize: 100,
+    fontSize: 40,
     fontWeight: "600",
     fontFamily: "gothic, sans-serif",
   },
